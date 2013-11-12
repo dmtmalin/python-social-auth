@@ -21,11 +21,11 @@ from social.tests.backends.test_facebook import *
 from social.tests.backends.test_fitbit import *
 from social.tests.backends.test_flickr import *
 from social.tests.backends.test_foursquare import *
-from social.tests.backends.test_google import *
+# from social.tests.backends.test_google import *
 from social.tests.backends.test_instagram import *
 from social.tests.backends.test_linkedin import *
 from social.tests.backends.test_live import *
-from social.tests.backends.test_livejournal import *
+# from social.tests.backends.test_livejournal import *
 from social.tests.backends.test_mixcloud import *
 from social.tests.backends.test_podio import *
 from social.tests.backends.test_readability import *
@@ -33,7 +33,7 @@ from social.tests.backends.test_reddit import *
 from social.tests.backends.test_skyrock import *
 from social.tests.backends.test_soundcloud import *
 from social.tests.backends.test_stackoverflow import *
-from social.tests.backends.test_steam import *
+# from social.tests.backends.test_steam import *
 from social.tests.backends.test_stocktwits import *
 from social.tests.backends.test_stripe import *
 from social.tests.backends.test_thisismyjam import *

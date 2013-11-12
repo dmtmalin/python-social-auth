@@ -90,12 +90,13 @@ class VKOAuth2(BaseOAuth2):
         return {'username': response.get('screen_name'),
                 'email': '',
                 'first_name': response.get('first_name'),
-                'last_name': response.get('last_name')}
+                'last_name': response.get('last_name'),
+                'avatar_url': response.get('avatar_url')}
 
     def user_data(self, access_token, response, *args, **kwargs):
         """Loads user data from service"""
         request_data = ['first_name', 'last_name', 'screen_name', 'nickname',
-                        'photo'] + self.setting('EXTRA_DATA', [])
+                        'photo_100'] + self.setting('EXTRA_DATA', [])
 
         fields = ','.join(set(request_data))
         data = vk_api(self, 'users.get', {
@@ -114,7 +115,7 @@ class VKOAuth2(BaseOAuth2):
 
         if data:
             data = data.get('response')[0]
-            data['user_photo'] = data.get('photo')  # Backward compatibility
+            data['avatar_url'] = data.get('photo_100')  # Backward compatibility
         return data
 
 

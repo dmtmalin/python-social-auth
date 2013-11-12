@@ -29,10 +29,10 @@ class MailruOAuth2(BaseOAuth2):
         """Return user details from Mail.ru request"""
         values = {'username': unquote(response['nick']),
                   'email': unquote(response['email']),
-                  'first_name': unquote(response['first_name']),
+                  'first_name': unquote(response[u'first_name']),
                   'last_name': unquote(response['last_name'])}
         if values['first_name'] and values['last_name']:
-            values['fullname'] = '{0} {1}'.format(values['first_name'],
+            values['fullname'] = u'{0} {1}'.format(values['first_name'],
                                                   values['last_name'])
         return values
 
@@ -46,4 +46,4 @@ class MailruOAuth2(BaseOAuth2):
         param_list = sorted(list(item + '=' + data[item] for item in data))
         data['sig'] = md5(''.join(param_list) + secret).hexdigest()
         return self.get_json('http://www.appsmail.ru/platform/api',
-                             params=data)
+                             params=data)[0]

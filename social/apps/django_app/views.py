@@ -1,5 +1,6 @@
 from django.contrib.auth import login, REDIRECT_FIELD_NAME, BACKEND_SESSION_KEY
 from django.contrib.auth.decorators import login_required
+from django.http import Http404
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.views.decorators.http import require_POST
 
@@ -13,6 +14,9 @@ LOGIN_ERROR_URL = setting('LOGIN_ERROR_URL', setting('LOGIN_URL'))
 
 @strategy('social:complete')
 def auth(request, backend):
+    if request.user.is_authenticated():
+        raise Http404
+
     return do_auth(request.strategy, redirect_name=REDIRECT_FIELD_NAME)
 
 
