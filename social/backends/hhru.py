@@ -15,6 +15,7 @@ import json
 
 from social.backends.oauth import BaseOAuth2
 
+
 class HhruOAuth2(BaseOAuth2):
     """HH.ru OAuth2 support"""
     name = 'hhru-oauth2'
@@ -30,11 +31,14 @@ class HhruOAuth2(BaseOAuth2):
             raise Exception(self)
 
     def get_user_details(self, response):
-        return {'username': response.get('email').split('@')[0],
+        username = ''.join(('hhru_', response.get('email', '').split('@')[0], '_', str(response.get('id'))))
+        return {'username': username,
                 'email': response.get('email'),
                 'first_name': response.get('first_name'),
                 'last_name': response.get('last_name'),
-                'is_employer': response.get('is_employer')}
+                'is_employer': response.get('is_employer'),
+                'employer': response.get('employer'),
+                }
 
     def user_data(self, access_token, response, *args, **kwargs):
         """Loads user data from service"""
