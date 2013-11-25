@@ -1,0 +1,13 @@
+Source: python-social-auth
+Maintainer: Anton Volozhanin <a.volozhanin@eastwoodlab.ru>
+Section: python
+Priority: extra
+Build-Depends: python-setuptools (>= 0.6b3), debhelper (>= 7), python-support (>= 0.8.4)
+Standards-Version: 3.7.2
+
+Package: python-social-auth-full
+Architecture: all
+Depends: ${python:Depends}, python-django (>=1.4)
+XB-Python-Version: ${python:Versions}
+Provides: ${python:Provides}
+Description: Auth for social networks

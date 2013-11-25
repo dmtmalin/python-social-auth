@@ -1,0 +1,5 @@
+python-social-auth (0.1.14-hh2) cf-stable; urgency=low
+
+  * Debianization for full package version
+
+ -- Anton Volozhanin <a.volozhanin@eastwoodlab.ru>  Mon, 25 Nov 2013 11:29:01 +0400

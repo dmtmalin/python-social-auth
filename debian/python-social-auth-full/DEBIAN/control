@@ -1,0 +1,12 @@
+Package: python-social-auth-full
+Source: python-social-auth
+Version: 0.1.14-hh2
+Architecture: all
+Maintainer: Anton Volozhanin <a.volozhanin@eastwoodlab.ru>
+Installed-Size: 2533
+Depends: python (<< 2.8), python (>= 2.6), python-support (>= 0.90.0), python-django (>= 1.4)
+Provides: python2.7-social-auth-full
+Section: python
+Priority: extra
+Description: Auth for social networks
+Python-Version: 2.7
