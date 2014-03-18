@@ -42,5 +42,8 @@ def setting(name, default=None):
 
 
 class BackendWrapper(object):
+    def authenticate(self, *args, **kwargs):
+        return None
+
     def get_user(self, user_id):
         return Strategy(storage=Storage).get_user(user_id)
