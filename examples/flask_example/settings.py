@@ -6,7 +6,9 @@ app.debug = True
 SECRET_KEY = 'random-secret-key'
 SESSION_COOKIE_NAME = 'psa_session'
 DEBUG = False
-SQLALCHEMY_DATABASE_URI = 'sqlite:///test.db'
+from os.path import dirname, abspath
+SQLALCHEMY_DATABASE_URI = 'sqlite:////%s/test.db' % dirname(abspath(__file__))
+
 DEBUG_TB_INTERCEPT_REDIRECTS = False
 SESSION_PROTECTION = 'strong'
 
@@ -46,6 +48,7 @@ SOCIAL_AUTH_AUTHENTICATION_BACKENDS = (
     'social.backends.thisismyjam.ThisIsMyJamOAuth1',
     'social.backends.stocktwits.StocktwitsOAuth2',
     'social.backends.tripit.TripItOAuth',
+    'social.backends.clef.ClefOAuth2',
     'social.backends.twilio.TwilioAuth',
     'social.backends.xing.XingOAuth',
     'social.backends.yandex.YandexOAuth2',

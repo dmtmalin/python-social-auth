@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-VK.com (former Vkontakte) OpenAPI and OAuth 2.0 support.
-
-This backend adds support for VK.com OpenAPI, OAuth2 and OAuth2 for IFrame
-applications.
+VK.com OpenAPI, OAuth2 and Iframe application OAuth2 backends, docs at:
+    http://psa.matiasaguirre.net/docs/backends/vk.html
 """
 from time import time
 from hashlib import md5
@@ -28,7 +26,8 @@ class VKontakteOpenAPI(BaseAuth):
             'first_name': response.get('first_name')[0]
                                 if 'first_name' in response else '',
             'last_name': response.get('last_name')[0]
-                                if 'last_name' in response else ''
+                                if 'last_name' in response else '',
+            'avatar_url': response.get('avatar_url'),
         }
 
     def user_data(self, access_token, *args, **kwargs):
@@ -57,7 +56,7 @@ class VKontakteOpenAPI(BaseAuth):
         check_str = ''.join(item + '=' + cookie_dict[item]
                                 for item in ['expire', 'mid', 'secret', 'sid'])
 
-        hash = md5(check_str + secret).hexdigest()
+        hash = md5((check_str + secret).encode('utf-8')).hexdigest()
 
         if hash != cookie_dict['sig'] or int(cookie_dict['expire']) < time():
             raise ValueError('VK.com authentication failed: invalid hash')
@@ -82,7 +81,7 @@ class VKOAuth2(BaseOAuth2):
     ACCESS_TOKEN_METHOD = 'POST'
     EXTRA_DATA = [
         ('id', 'id'),
-        ('expires', 'expires')
+        ('expires_in', 'expires')
     ]
 
     def get_user_details(self, response):
@@ -95,7 +94,7 @@ class VKOAuth2(BaseOAuth2):
     def user_data(self, access_token, response, *args, **kwargs):
         """Loads user data from service"""
         request_data = ['first_name', 'last_name', 'screen_name', 'nickname',
-                        'photo'] + self.setting('EXTRA_DATA', [])
+                        'photo_100'] + self.setting('EXTRA_DATA', [])
 
         fields = ','.join(set(request_data))
         data = vk_api(self, 'users.get', {
@@ -114,7 +113,7 @@ class VKOAuth2(BaseOAuth2):
 
         if data:
             data = data.get('response')[0]
-            data['user_photo'] = data.get('photo')  # Backward compatibility
+            data['avatar_url'] = data.get('photo_100')  # Backward compatibility
         return data
 
 
@@ -123,7 +122,10 @@ class VKAppOAuth2(VKOAuth2):
     name = 'vk-app'
 
     def user_profile(self, user_id, access_token=None):
-        data = {'uids': user_id, 'fields': 'photo'}
+        request_data = ['first_name', 'last_name', 'screen_name', 'nickname',
+                        'photo'] + self.setting('EXTRA_DATA', [])
+        fields = ','.join(set(request_data))
+        data = {'uids': user_id, 'fields': fields}
         if access_token:
             data['access_token'] = access_token
         profiles = vk_api(self, 'getProfiles', data).get('response')
@@ -143,7 +145,7 @@ class VKAppOAuth2(VKOAuth2):
         if auth_key:
             check_key = md5('_'.join([key,
                                       self.data.get('viewer_id'),
-                                      secret])).hexdigest()
+                                      secret]).encode('utf-8')).hexdigest()
             if check_key != auth_key:
                 raise ValueError('VK.com authentication failed: invalid '
                                  'auth key')
@@ -191,7 +193,9 @@ def vk_api(backend, method, data):
         data['format'] = 'json'
         url = 'http://api.vk.com/api.php'
         param_list = sorted(list(item + '=' + data[item] for item in data))
-        data['sig'] = md5(''.join(param_list) + secret).hexdigest()
+        data['sig'] = md5(
+            (''.join(param_list) + secret).encode('utf-8')
+        ).hexdigest()
     else:
         url = 'https://api.vk.com/method/' + method
 

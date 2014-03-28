@@ -6,6 +6,7 @@ import six
 
 from social.utils import setting_name, module_member
 from social.store import OpenIdStore, OpenIdSessionWrapper
+from social.pipeline import DEFAULT_AUTH_PIPELINE, DEFAULT_DISCONNECT_PIPELINE
 
 
 class BaseTemplateStrategy(object):
@@ -42,8 +43,12 @@ class BaseStrategy(object):
         self.backend = backend(strategy=self, *args, **kwargs) \
                             if backend else None
 
-    def setting(self, name, default=None):
-        for name in (setting_name(name), name):
+    def setting(self, name, default=None, backend=None):
+        names = [setting_name(name), name]
+        backend = backend or getattr(self, 'backend', None)
+        if backend:
+            names.insert(0, setting_name(backend.name, name))
+        for name in names:
             try:
                 return self.get_setting(name)
             except (AttributeError, KeyError):
@@ -164,31 +169,10 @@ class BaseStrategy(object):
         return OpenIdStore(self)
 
     def get_pipeline(self):
-        return self.setting(
-            'PIPELINE', (
-                'social.pipeline.social_auth.social_details',
-                'social.pipeline.social_auth.social_uid',
-                'social.pipeline.social_auth.auth_allowed',
-                'social.pipeline.social_auth.social_user',
-                'social.pipeline.user.get_username',
-                # 'social.pipeline.mail.mail_validation',
-                # 'social.pipeline.social_auth.associate_by_email',
-                'social.pipeline.user.create_user',
-                'social.pipeline.social_auth.associate_user',
-                'social.pipeline.social_auth.load_extra_data',
-                'social.pipeline.user.user_details'
-            )
-        )
+        return self.setting('PIPELINE', DEFAULT_AUTH_PIPELINE)
 
     def get_disconnect_pipeline(self):
-        return self.setting(
-            'DISCONNECT_PIPELINE', (
-                'social.pipeline.disconnect.allowed_to_disconnect',
-                'social.pipeline.disconnect.get_entries',
-                'social.pipeline.disconnect.revoke_tokens',
-                'social.pipeline.disconnect.disconnect'
-            )
-        )
+        return self.setting('DISCONNECT_PIPELINE', DEFAULT_DISCONNECT_PIPELINE)
 
     def random_string(self, length=12, chars=ALLOWED_CHARS):
         # Implementation borrowed from django 1.4
@@ -202,7 +186,7 @@ class BaseStrategy(object):
 
     def absolute_uri(self, path=None):
         uri = self.build_absolute_uri(path)
-        if self.setting('ON_HTTPS'):
+        if uri and self.setting('REDIRECT_IS_HTTPS'):
             uri = uri.replace('http://', 'https://')
         return uri
 

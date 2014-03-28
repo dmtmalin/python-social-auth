@@ -108,7 +108,12 @@ class OpenIdAuth(BaseAuth):
         """
         sreg_names = self.setting('SREG_EXTRA_DATA')
         ax_names = self.setting('AX_EXTRA_DATA')
-        return self.values_from_response(response, sreg_names, ax_names)
+        values = self.values_from_response(response, sreg_names, ax_names)
+        from_details = super(OpenIdAuth, self).extra_data(
+            user, uid, {}, details
+        )
+        values.update(from_details)
+        return values
 
     def auth_url(self):
         """Return auth URL returned by service"""
@@ -190,7 +195,7 @@ class OpenIdAuth(BaseAuth):
             except (ValueError, TypeError):
                 max_age = None
 
-        if any((max_age, preferred_policies, preferred_level_types)):
+        if max_age is not None or preferred_policies or preferred_level_types:
             pape_request = pape.Request(
                 max_auth_age=max_age,
                 preferred_auth_policies=preferred_policies,
