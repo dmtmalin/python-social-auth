@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Setup file for easy installation"""
 import sys
+import multiprocessing
 import os
 from os.path import join, dirname, split
 from setuptools import setup
