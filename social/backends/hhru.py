@@ -12,8 +12,12 @@ Then update your settings values using registration information
 
 import urllib2
 import json
+from urlparse import urlparse
+
+from django.shortcuts import redirect
 
 from social.backends.oauth import BaseOAuth2
+
 
 class HhruOAuth2(BaseOAuth2):
     """HH.ru OAuth2 support"""
@@ -24,6 +28,9 @@ class HhruOAuth2(BaseOAuth2):
     ID_KEY = 'id'
 
     def auth_complete(self, *args, **kwargs):
+        if 'error' in self.data and self.data['error'] == u'access_denied':
+            url_parse = urlparse(self.redirect_uri)
+            return redirect(url_parse.scheme+'://'+url_parse.netloc+'/')
         try:
             return super(HhruOAuth2, self).auth_complete(*args, **kwargs)
         except urllib2.HTTPError:
